@@ -1,20 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Home, User, Lightbulb, Briefcase, FolderKanban, Network, Mail } from 'lucide-react';
+import { Dock, DockItem, DockLabel, DockIcon } from '@/components/core/dock';
 
-const sectionLabels: Record<string, string> = {
-  hero: 'Hero',
-  about: 'About',
-  mindset: 'Engineering Mindset',
-  experience: 'Experience',
-  projects: 'Projects',
-  architecture: 'Architecture',
-  contact: 'Contact',
+const sectionData: Record<string, { label: string, icon: React.ElementType }> = {
+  hero: { label: 'Hero', icon: Home },
+  about: { label: 'About', icon: User },
+  mindset: { label: 'Engineering Mindset', icon: Lightbulb },
+  experience: { label: 'Experience', icon: Briefcase },
+  projects: { label: 'Projects', icon: FolderKanban },
+  architecture: { label: 'Architecture', icon: Network },
+  contact: { label: 'Contact', icon: Mail },
 };
 
 export default function ScrollSpy({ sectionOrder }: { sectionOrder?: string[] }) {
   const [activeId, setActiveId] = useState('hero');
-  const [activeSections, setActiveSections] = useState<{id: string, label: string}[]>([]);
+  const [activeSections, setActiveSections] = useState<{id: string, label: string, icon: React.ElementType}[]>([]);
 
   useEffect(() => {
     // Timeout to ensure DOM nodes are painted since some sections load asynchronously
@@ -22,8 +24,14 @@ export default function ScrollSpy({ sectionOrder }: { sectionOrder?: string[] })
       const defaultOrder = ['hero', 'about', 'mindset', 'experience', 'projects', 'architecture', 'contact'];
       const order = sectionOrder?.length ? sectionOrder : defaultOrder;
       
-      const exists = order.map(id => ({ id, label: sectionLabels[id] || id }))
-                          .filter(({ id }) => document.getElementById(id));
+      const exists = order
+        .map(id => ({ 
+          id, 
+          label: sectionData[id]?.label || id,
+          icon: sectionData[id]?.icon || Home
+        }))
+        .filter(({ id }) => document.getElementById(id));
+      
       setActiveSections(exists);
 
       const observer = new IntersectionObserver(
@@ -49,24 +57,25 @@ export default function ScrollSpy({ sectionOrder }: { sectionOrder?: string[] })
   }, [sectionOrder]);
 
   return (
-    <div className="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-50 hidden lg:flex">
-      {activeSections.map(({ id, label }) => (
-        <button
-          key={id}
-          onClick={() => {
-            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 relative group ${
-            activeId === id ? 'bg-[#EA580C] scale-125' : 'bg-[#333333] hover:bg-[#666666]'
-          }`}
-          data-cursor="button"
-          aria-label={`Scroll to ${label}`}
-        >
-          <span className="absolute right-6 top-1/2 -translate-y-1/2 px-2 py-1 bg-[#121212] border border-[#222222] text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            {label}
-          </span>
-        </button>
-      ))}
+    <div className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:flex">
+      <Dock>
+        {activeSections.map(({ id, label, icon: Icon }) => (
+          <DockItem
+            key={id}
+            isActive={activeId === id}
+            aria-label={`Scroll to ${label}`}
+            data-cursor="button"
+            onClick={() => {
+              document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <DockLabel>{label}</DockLabel>
+            <DockIcon>
+              <Icon className={`w-5 h-5 transition-colors duration-300 ${activeId === id ? 'text-[#EA580C]' : 'text-[#9CA3AF]'}`} />
+            </DockIcon>
+          </DockItem>
+        ))}
+      </Dock>
     </div>
   );
 }
