@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 import { useMagneticHover } from '@/lib/hooks/useMagneticHover';
 
 export default function Contact() {
+  const CONTACT_EMAIL = 'digvijaysingh4040@gmail.com';
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -36,11 +37,11 @@ export default function Contact() {
           </p>
           <div className="flex items-center justify-center gap-2">
             <span className="text-[#EA580C] font-mono bg-[#EA580C]/10 px-3 py-1 rounded-md border border-[#EA580C]/20">
-              hello@digvijay.dev
+              {CONTACT_EMAIL}
             </span>
             <button
               onClick={() => {
-                navigator.clipboard.writeText('hello@digvijay.dev');
+                navigator.clipboard.writeText(CONTACT_EMAIL);
                 import('react-hot-toast').then(({ default: toast }) => toast.success('Email copied!'));
               }}
               className="p-1.5 text-[#9CA3AF] hover:text-white hover:bg-[#222222] rounded-md transition-colors"

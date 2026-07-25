@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Home, User, Lightbulb, Briefcase, FolderKanban, Network, Mail } from 'lucide-react';
 import { Dock, DockItem, DockLabel, DockIcon } from '@/components/core/dock';
 
-const sectionData: Record<string, { label: string, icon: React.ElementType }> = {
+const sectionData: Record<string, { label: string, icon: React.ElementType<any> }> = {
   hero: { label: 'Hero', icon: Home },
   about: { label: 'About', icon: User },
   mindset: { label: 'Engineering Mindset', icon: Lightbulb },
@@ -16,7 +16,7 @@ const sectionData: Record<string, { label: string, icon: React.ElementType }> = 
 
 export default function ScrollSpy({ sectionOrder }: { sectionOrder?: string[] }) {
   const [activeId, setActiveId] = useState('hero');
-  const [activeSections, setActiveSections] = useState<{id: string, label: string, icon: React.ElementType}[]>([]);
+  const [activeSections, setActiveSections] = useState<{id: string, label: string, icon: React.ElementType<any>}[]>([]);
 
   useEffect(() => {
     // Timeout to ensure DOM nodes are painted since some sections load asynchronously

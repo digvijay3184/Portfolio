@@ -1,4 +1,11 @@
+'use client';
+
+import { useState } from 'react';
+import ExperienceTreeModal from './experience/ExperienceTreeModal';
+
 export default function Experience({ data }: { data: any[] }) {
+  const [activeExperience, setActiveExperience] = useState<any | null>(null);
+
   if (!data || data.length === 0) return null;
 
   const formatDate = (dateString: string) => {
@@ -18,9 +25,15 @@ export default function Experience({ data }: { data: any[] }) {
         
         <div className="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-[#222222] before:to-transparent">
           {data.map((job, idx) => (
-            <div key={job._id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+            <div 
+              key={job._id} 
+              className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active cursor-pointer"
+              onClick={() => setActiveExperience(job)}
+              data-cursor="button"
+            >
               {/* Timeline dot */}
               <div className="flex items-center justify-center w-10 h-10 rounded-full border border-[#222222] bg-[#121212] group-hover:border-[#EA580C] text-[#EA580C] shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-colors duration-300">
+
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 8 8 8.009 8.009 0 0 0-8-8Zm0 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" /></svg>
               </div>
               
@@ -45,11 +58,24 @@ export default function Experience({ data }: { data: any[] }) {
                     ))}
                   </div>
                 )}
+                {job.workTree && job.workTree.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-[#222222] text-sm text-[#EA580C] font-medium flex items-center gap-1 group-hover:gap-2 transition-all duration-300">
+                    <span>Click to view work breakdown</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
+      
+      <ExperienceTreeModal 
+        experience={activeExperience} 
+        onClose={() => setActiveExperience(null)} 
+      />
     </section>
   );
 }

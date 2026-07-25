@@ -63,7 +63,49 @@ export class ContentService {
     return model.findById(id).exec();
   }
 
+  private async validateWorkTree(workTree: any[]) {
+    if (!Array.isArray(workTree) || workTree.length === 0) return;
+
+    const nodeIds = new Set(workTree.map(n => n.nodeId));
+    if (nodeIds.size !== workTree.length) {
+      throw new BadRequestException('Duplicate nodeId found in workTree');
+    }
+
+    const nodeMap = new Map(workTree.map(n => [n.nodeId, n]));
+
+    for (const node of workTree) {
+      if (!node.nodeId) throw new BadRequestException('nodeId is required');
+      const label = typeof node.label === 'string' ? node.label.trim() : '';
+      if (label.length < 1 || label.length > 120) {
+        throw new BadRequestException(`Label for node ${node.nodeId} must be between 1 and 120 characters`);
+      }
+
+      if (node.parentId && !nodeMap.has(node.parentId)) {
+        throw new BadRequestException(`Parent node ${node.parentId} not found in workTree`);
+      }
+
+      let depth = 1;
+      let current = node;
+      const visited = new Set([current.nodeId]);
+      
+      while (current.parentId) {
+        if (visited.has(current.parentId)) {
+          throw new BadRequestException(`Cycle detected in workTree involving node ${current.parentId}`);
+        }
+        depth++;
+        if (depth > 4) {
+          throw new BadRequestException(`Max depth of 4 exceeded in workTree for node ${node.nodeId}`);
+        }
+        visited.add(current.parentId);
+        current = nodeMap.get(current.parentId);
+      }
+    }
+  }
+
   async create(modelName: string, data: any) {
+    if (modelName.toLowerCase() === 'experience' && data.workTree) {
+      await this.validateWorkTree(data.workTree);
+    }
     const model = this.getModel(modelName);
     const created = await model.create(data);
     await this.triggerIsr(modelName);
@@ -71,6 +113,9 @@ export class ContentService {
   }
 
   async update(modelName: string, id: string, data: any) {
+    if (modelName.toLowerCase() === 'experience' && data.workTree) {
+      await this.validateWorkTree(data.workTree);
+    }
     const model = this.getModel(modelName);
     const updated = await model.findByIdAndUpdate(id, data, { returnDocument: 'after' }).exec();
     await this.triggerIsr(modelName);

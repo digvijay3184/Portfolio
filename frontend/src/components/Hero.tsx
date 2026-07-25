@@ -46,7 +46,7 @@ export default function Hero({ data }: { data: any }) {
           <div className="flex gap-4 mt-8">
             <EncryptButton 
               href="#contact" 
-              label={data.ctaLabel} 
+              label={"Contact Me"} 
               className="shadow-[0_0_15px_rgba(234,88,12,0.3)] hover:shadow-[0_0_25px_rgba(234,88,12,0.5)] backdrop-blur-md"
             />
             {data.cvUrl && (

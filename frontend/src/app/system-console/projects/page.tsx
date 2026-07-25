@@ -90,7 +90,7 @@ export default function ProjectsAdminPage() {
     const toastId = toast.loading(`Uploading ${files.length} gallery image(s)...`);
     setIsUploading(true);
     try {
-      const uploaded = [];
+      const uploaded: Array<{ url: string; publicId: string; caption: string }> = [];
       for (let i = 0; i < files.length; i++) {
         const { url, publicId } = await uploadMedia.mutateAsync(files[i]);
         uploaded.push({ url, publicId, caption: '' });
