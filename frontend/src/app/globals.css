@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #050505;
+  --color-foreground: #9CA3AF;
+  
+  --color-surface: #121212;
+  --color-border: #222222;
+  --color-heading: #FFFFFF;
+  --color-paragraph: #9CA3AF;
+  
+  --color-primary: #EA580C;
+  --color-primary-hover: #F97316;
+  --color-link: #FBBF24;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Glassmorphism utilities */
+  --bg-glass: rgba(18, 18, 18, 0.6);
+  --border-glass: rgba(255, 255, 255, 0.05);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base styles for Typography */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading);
+}
+
+p {
+  color: var(--color-paragraph);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--color-link);
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Utilities for animations */
+@layer utilities {
+  .glass-panel {
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+  }
+  
+  .glass-button {
+    background: rgba(234, 88, 12, 0.1);
+    border: 1px solid rgba(234, 88, 12, 0.2);
+    color: var(--color-primary);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+  }
+  
+  .glass-button:hover {
+    background: rgba(234, 88, 12, 0.2);
+    border-color: rgba(234, 88, 12, 0.4);
+    transform: translateY(-1px);
+  }
+}
+.hide-native-cursor, .hide-native-cursor * { cursor: none !important; }
