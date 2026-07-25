@@ -7,6 +7,8 @@ import { Trash2, Edit2, X } from 'lucide-react';
 import JsonImporter from '@/components/admin/JsonImporter';
 import { experienceSchema } from '@/lib/validations/jsonSchemas';
 import toast from 'react-hot-toast';
+import WorkTreeEditor from '@/components/admin/experience/WorkTreeEditor';
+import { WorkNode } from '@/lib/tree/buildTree';
 
 const experienceExampleTemplate = `{
   "company": "Google",
@@ -16,14 +18,26 @@ const experienceExampleTemplate = `{
   "achievements": [
     "Led the frontend architecture rewrite",
     "Improved performance by 40%"
+  ],
+  "workTree": [
+    {
+      "nodeId": "root_1",
+      "parentId": null,
+      "label": "Frontend Rewrite",
+      "description": "Led the rewrite of the main dashboard",
+      "type": "project",
+      "order": 0
+    }
   ]
 }`;
 
 export default function ExperienceAdminPage() {
   const { data: experiences, isLoading, create, remove, update } = useContent('experience');
   const { register, handleSubmit, reset } = useForm();
+  const [newWorkTree, setNewWorkTree] = useState<WorkNode[]>([]);
   
   const [editingExp, setEditingExp] = useState<any>(null);
+  const [editWorkTree, setEditWorkTree] = useState<WorkNode[]>([]);
   const { register: registerEdit, handleSubmit: handleSubmitEdit, reset: resetEdit } = useForm();
 
   const handleJsonImport = (validatedData: any) => {
@@ -33,6 +47,9 @@ export default function ExperienceAdminPage() {
         ? validatedData.achievements.join('\n') 
         : validatedData.achievements
     });
+    if (validatedData.workTree) {
+      setNewWorkTree(validatedData.workTree);
+    }
     toast.success('JSON imported successfully');
   };
   
@@ -41,18 +58,21 @@ export default function ExperienceAdminPage() {
       const formattedPayload = {
         ...payload,
         achievements: payload.achievements.split('\n').map((a: string) => a.trim()).filter(Boolean),
+        workTree: newWorkTree,
       };
       
       await create(formattedPayload);
       reset();
+      setNewWorkTree([]);
       toast.success('Experience added!');
-    } catch (err) {
-      toast.error('Failed to add experience');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || err.message || 'Failed to add experience');
     }
   };
 
   const openEditModal = (exp: any) => {
     setEditingExp(exp);
+    setEditWorkTree(exp.workTree || []);
     resetEdit({
       company: exp.company,
       role: exp.role,
@@ -67,12 +87,17 @@ export default function ExperienceAdminPage() {
       const formattedPayload = {
         ...payload,
         achievements: payload.achievements.split('\n').map((a: string) => a.trim()).filter(Boolean),
+        workTree: editWorkTree,
       };
       await update({ id: editingExp._id, data: formattedPayload });
       setEditingExp(null);
+      setEditWorkTree([]);
       toast.success('Experience updated!');
-    } catch (err) {
-      toast.error('Failed to update experience');
+    } catch (err: any) {
+      const errorMessage = Array.isArray(err?.response?.data?.message) 
+        ? err.response.data.message[0] 
+        : err?.response?.data?.message || err.message || 'Failed to update experience';
+      toast.error(`Failed to update: ${errorMessage}`);
     }
   };
 
@@ -118,6 +143,11 @@ export default function ExperienceAdminPage() {
           <div>
             <label className="block text-sm text-[#9CA3AF] mb-2">Achievements (One per line)</label>
             <textarea {...register('achievements')} required rows={4} className="w-full bg-[#050505] border border-[#222222] text-white rounded-md px-4 py-2 focus:border-[#EA580C]" />
+          </div>
+
+          <div className="pt-4 border-t border-[#222222]">
+            <h4 className="text-lg font-medium text-white mb-4">Work Breakdown</h4>
+            <WorkTreeEditor nodes={newWorkTree} onChange={setNewWorkTree} />
           </div>
           <button type="submit" className="bg-[#EA580C] hover:bg-[#F97316] text-white px-6 py-2 rounded-md">
             Add Experience
@@ -184,6 +214,11 @@ export default function ExperienceAdminPage() {
               <div>
                 <label className="block text-sm text-[#9CA3AF] mb-2">Achievements (One per line)</label>
                 <textarea {...registerEdit('achievements')} required rows={4} className="w-full bg-[#050505] border border-[#222222] text-white rounded-md px-4 py-2 focus:border-[#EA580C]" />
+              </div>
+
+              <div className="pt-4 border-t border-[#222222]">
+                <h4 className="text-lg font-medium text-white mb-4">Work Breakdown</h4>
+                <WorkTreeEditor nodes={editWorkTree} onChange={setEditWorkTree} />
               </div>
               <div className="flex justify-end gap-4 mt-6">
                 <button

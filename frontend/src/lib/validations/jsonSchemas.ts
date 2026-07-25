@@ -18,12 +18,24 @@ export const aboutSchema = z.object({
   imagePublicId: z.string().optional().or(z.literal('')),
 });
 
+const workNodeSchema = z.object({
+  nodeId: z.string(),
+  parentId: z.string().nullable(),
+  label: z.string(),
+  description: z.string().optional(),
+  type: z.enum(['project', 'feature', 'task', 'milestone']).default('task'),
+  icon: z.string().optional(),
+  techStack: z.array(z.string()).optional(),
+  order: z.number().default(0)
+});
+
 export const experienceSchema = z.object({
   company: z.string().min(1, 'Company is required'),
   role: z.string().min(1, 'Role is required'),
   startDate: z.string().regex(/^\d{4}-\d{2}(-\d{2})?$/, 'Must be YYYY-MM or YYYY-MM-DD format'),
   endDate: z.string().regex(/^\d{4}-\d{2}(-\d{2})?$/, 'Must be YYYY-MM or YYYY-MM-DD format').optional().or(z.literal('')),
   achievements: z.string().or(z.array(z.string())), // Can be string with \n or array
+  workTree: z.array(workNodeSchema).optional(),
 });
 
 export const projectSchema = z.object({
