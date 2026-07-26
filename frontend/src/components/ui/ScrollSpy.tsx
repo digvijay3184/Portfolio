@@ -17,6 +17,14 @@ const sectionData: Record<string, { label: string, icon: React.ComponentType<{ c
 export default function ScrollSpy({ sectionOrder }: { sectionOrder?: string[] }) {
   const [activeId, setActiveId] = useState('hero');
   const [activeSections, setActiveSections] = useState<{id: string, label: string, icon: React.ComponentType<{ className?: string }> }[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile(); // Check immediately on mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     // Timeout to ensure DOM nodes are painted since some sections load asynchronously
@@ -57,9 +65,8 @@ export default function ScrollSpy({ sectionOrder }: { sectionOrder?: string[] })
   }, [sectionOrder]);
 
   return (
-    <div className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:flex">
-      <Dock>
-        {activeSections.map(({ id, label, icon: Icon }) => (
+    <div className="fixed bottom-6 lg:bottom-auto left-1/2 lg:left-auto -translate-x-1/2 lg:translate-x-0 lg:right-6 lg:top-1/2 lg:-translate-y-1/2 z-50 max-w-[calc(100vw-1rem)]">
+      <Dock position={isMobile ? 'bottom' : 'right'} className="w-auto overflow-x-auto pb-3 lg:pb-2 lg:overflow-visible justify-start lg:justify-center [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">        {activeSections.map(({ id, label, icon: Icon }) => (
           <DockItem
             key={id}
             isActive={activeId === id}

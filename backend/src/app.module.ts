@@ -5,6 +5,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
 import { AdminUser, AdminUserSchema } from './schemas/admin-user.schema';
 import { Hero, HeroSchema } from './schemas/hero.schema';
@@ -65,7 +66,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ContactModule,
     DashboardModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule {}
